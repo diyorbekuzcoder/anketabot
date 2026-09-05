@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zeytun Supermarket</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <div class="top-header">
+        <div style="width:32px;"></div> <!-- placeholder to balance refresh btn -->
+        <div class="titles">
+            <h1>Zeytun Supermarket</h1>
+            <p>anketasi</p>
+        </div>
+        <button class="refresh-btn" onclick="window.location.reload()">↻</button>
+    </div>
+
+    <div class="stepper-container">
+        <div class="stepper" id="stepper">
+            <div class="step-indicator active" id="ind-1">
+                <div class="step-dot">1</div>
+                <div class="step-label">Shaxsiy</div>
+            </div>
+            <div class="step-indicator" id="ind-2">
+                <div class="step-dot">2</div>
+                <div class="step-label">Ta'lim</div>
+            </div>
+            <div class="step-indicator" id="ind-3">
+                <div class="step-dot">3</div>
+                <div class="step-label">Joylashuv</div>
+            </div>
+            <div class="step-indicator" id="ind-4">
+                <div class="step-dot">4</div>
+                <div class="step-label">Ish</div>
+            </div>
+            <div class="step-indicator" id="ind-5">
+                <div class="step-dot">5</div>
+                <div class="step-label">Qo'shimcha</div>
+            </div>
+            <div class="step-indicator" id="ind-6">
+                <div class="step-dot">6</div>
+                <div class="step-label">Hujjatlar</div>
+            </div>
+        </div>
+    </div>
+
+    <form id="anketa-form" enctype="multipart/form-data">
+        <div class="container">
+            
+            <!-- BOSQICH 1 -->
+            <div class="step-content active" id="step-1">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📝</div>
+                        <div class="card-title-group">
+                            <h2>Asosiy ma'lumotlar</h2>
+                            <p>Passport ma'lumotlariga asosan to'ldiring</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ism <span class="req">*</span></label>
+                        <input type="text" name="ism" placeholder="Ismingizni kiriting" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Familiya <span class="req">*</span></label>
+                        <input type="text" name="familiya" placeholder="Familiyangizni kiriting" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Otasining ismi <span class="req">*</span></label>
+                        <input type="text" name="otasining_ismi" placeholder="Otangizning ismini kiriting" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tug'ilgan sana <span class="req">*</span></label>
+                        <input type="date" name="tugilgan_sana" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Jinsingiz <span class="req">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="jins" value="Erkak" required>
+                                👨 Erkak
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="jins" value="Ayol">
+                                👩 Ayol
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Oilaviy holatingiz <span class="req">*</span></label>
+                        <select name="oilaviy_holati" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Uylangan/Turmushga chiqqan">Uylangan/Turmushga chiqqan</option>
+                            <option value="Bo'ydoq/Turmushga chiqmagan">Bo'ydoq/Turmushga chiqmagan</option>
+                            <option value="Ajrashgan">Ajrashgan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">👶</span>
+                                    <div class="list-group-title">Farzandlari</div>
+                                </div>
+                                <span class="list-group-desc">Barcha farzandlaringiz ro'yxati</span>
+                            </div>
+                            <button type="button" class="btn-icon-add" onclick="addChild()">+</button>
+                        </div>
+                        <div id="children-list" class="list-items"></div>
+                        <div class="list-empty-state" id="children-empty">
+                            <span class="emoji">📋</span>
+                            <p>Farzand qo'shilmagan. '+' tugmasini bosing</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">👨‍👩‍👧‍👦</span>
+                                    <div class="list-group-title">Oilaviy tarkib</div>
+                                </div>
+                                <span class="list-group-desc">Ota-ona, aka-uka, opa-singil</span>
+                            </div>
+                            <button type="button" class="btn-icon-add" onclick="addFamily()">+</button>
+                        </div>
+                        <div id="family-list" class="list-items"></div>
+                        <div class="list-empty-state" id="family-empty">
+                            <span class="emoji">📋</span>
+                            <p>Oila a'zosi qo'shilmagan. '+' tugmasini bosing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOSQICH 2 -->
+            <div class="step-content" id="step-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📚</div>
+                        <div class="card-title-group">
+                            <h2>Ta'lim darajasi</h2>
+                            <p>Eng yuqori ta'lim darajangizni tanlang</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ma'lumotingiz <span class="req">*</span></label>
+                        <select name="malumoti" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="O'rta">O'rta</option>
+                            <option value="O'rta maxsus">O'rta maxsus</option>
+                            <option value="Oliy (Bakalavr)">Oliy (Bakalavr)</option>
+                            <option value="Oliy (Magistr)">Oliy (Magistr)</option>
+                            <option value="Doktorantura">Doktorantura</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Hozirda universitet yoki kollej talabasimisiz? <span class="req">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="talabami" value="Ha" required>
+                                🎓 Ha
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="talabami" value="Yo'q">
+                                ❌ Yo'q
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">🏫</span>
+                                    <div class="list-group-title">Ta'lim muassasalari</div>
+                                </div>
+                                <span class="list-group-desc">O'qigan barcha muassasalar</span>
+                            </div>
+                            <button type="button" class="btn-icon-add" onclick="addEducation()">+</button>
+                        </div>
+                        <div id="education-list" class="list-items"></div>
+                        <div class="list-empty-state" id="education-empty">
+                            <span class="emoji">📋</span>
+                            <p>Ta'lim muassasasi qo'shilmagan.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">🌍</span>
+                                    <div class="list-group-title">Til bilimi</div>
+                                </div>
+                                <span class="list-group-desc">Bilgan tillaringiz va daraja</span>
+                            </div>
+                            <button type="button" class="btn-icon-add" onclick="addLanguage()">+</button>
+                        </div>
+                        <div id="language-list" class="list-items"></div>
+                        <div class="list-empty-state" id="language-empty">
+                            <span class="emoji">📋</span>
+                            <p>Til ma'lumoti kiritilmagan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOSQICH 3 -->
+            <div class="step-content" id="step-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📏</div>
+                        <div class="card-title-group">
+                            <h2>Jismoniy va Manzil</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row-inputs">
+                        <div class="form-group">
+                            <label>Bo'y (sm) <span class="req">*</span></label>
+                            <input type="number" name="boy" placeholder="sm" min="100" max="250" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Vazn (kg) <span class="req">*</span></label>
+                            <input type="number" name="vazn" placeholder="kg" min="30" max="200" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Viloyat <span class="req">*</span></label>
+                        <select name="viloyat" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Toshkent sh.">Toshkent sh.</option>
+                            <option value="Toshkent vil.">Toshkent vil.</option>
+                            <option value="Samarqand">Samarqand vil.</option>
+                            <option value="Boshqa">Boshqa</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Shahar / Tuman <span class="req">*</span></label>
+                        <input type="text" name="tuman" placeholder="Tumanni kiriting" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>MFY, ko'cha, uy raqami <span class="req">*</span></label>
+                        <textarea name="manzil_toliq" rows="2" placeholder="To'liq manzil" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💼</div>
+                        <div class="card-title-group">
+                            <h2>Ish xohishi</h2>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Qaysi filialda ishlashni xohlaysiz? <span class="req">*</span></label>
+                        <select name="filial" id="filial-select" required>
+                            <option value="" disabled selected>Yuklanmoqda...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Qaysi lavozimlarda ishlashni xohlaysiz? <span class="req">*</span></label>
+                        <select name="lavozim" id="lavozim-select" required>
+                            <option value="" disabled selected>Yuklanmoqda...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOSQICH 4 -->
+            <div class="step-content" id="step-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔍</div>
+                        <div class="card-title-group">
+                            <h2>Ish holati</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Avval bizning kompaniyamizda ishlaganmisiz? <span class="req">*</span></label>
+                        <select name="avval_ishlagan" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Ha">✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>O'zbekiston Respublikasi fuqarosimisiz? <span class="req">*</span></label>
+                        <select name="fuqaro" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Ha">✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Hozirda ish bilan ta'minlanganmisiz? <span class="req">*</span></label>
+                        <select name="ishlaydimi" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Ha">✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Shaxsiy avtomobilingiz bormi? <span class="req">*</span></label>
+                        <select name="avto" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Ha">✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Xizmat safariga bora olasizmi? <span class="req">*</span></label>
+                        <select name="xizmat_safari" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Ha">✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kompaniyamizda ishlaydigan yaqinlaringiz bormi?</label>
+                        <textarea name="qarindoshlar" rows="2" placeholder="Masalan: Aliyev Vali, Sotuvchi"></textarea>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">💻</span>
+                                    <div class="list-group-title">Dasturlar bilimlari</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-icon-add" onclick="addSoftware()">+</button>
+                        </div>
+                        <div id="software-list" class="list-items"></div>
+                        <div class="list-empty-state" id="software-empty">
+                            <span class="emoji">📋</span>
+                            <p>Dastur ma'lumoti kiritilmagan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOSQICH 5 -->
+            <div class="step-content" id="step-5">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🏥</div>
+                        <div class="card-title-group">
+                            <h2>Sog'liq holati</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>1. Og'ir narsalar ko'tara olasizmi?</label>
+                        <select name="sogliq_ogir_narsa" required>
+                            <option value="Ha">✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                        <input type="text" name="sogliq_ogir_narsa_izoh" placeholder="Izoh (ixtiyoriy)" style="margin-top:8px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>2. Yuragingizdan shikoyatingiz bormi?</label>
+                        <select name="sogliq_yurak" required>
+                            <option value="Yo'q" selected>❌ Yo'q</option>
+                            <option value="Ha">✅ Ha</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>3. Og'ir jarrohlik amaliyotini o'taganmisiz?</label>
+                        <select name="sogliq_jarrohlik" required>
+                            <option value="Yo'q" selected>❌ Yo'q</option>
+                            <option value="Ha">✅ Ha</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>4. Ko'zingizdan shikoyatingiz bormi?</label>
+                        <select name="sogliq_koz" required>
+                            <option value="Yo'q" selected>❌ Yo'q</option>
+                            <option value="Ha">✅ Ha</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>5. Bel og'rig'idan shikoyatingiz bormi?</label>
+                        <select name="sogliq_bel" required>
+                            <option value="Yo'q" selected>❌ Yo'q</option>
+                            <option value="Ha">✅ Ha</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>6. Bir joyda turib/o'tirib ishlay olasizmi?</label>
+                        <select name="sogliq_joyida_ishlash" required>
+                            <option value="Ha" selected>✅ Ha</option>
+                            <option value="Yo'q">❌ Yo'q</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">💼</span>
+                                    <div class="list-group-title">Ish tajribasi</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-icon-add" onclick="addExperience()">+</button>
+                        </div>
+                        <div id="experience-list" class="list-items"></div>
+                        <div class="list-empty-state" id="experience-empty">
+                            <span class="emoji">📋</span>
+                            <p>Ish tarixi kiritilmagan.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💰</div>
+                        <div class="card-title-group">
+                            <h2>Maosh va boshqalar</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Oxirgi ish joyida olgan ish haqingiz (so'm) <span class="req">*</span></label>
+                        <input type="number" name="oxirgi_maosh" placeholder="3000000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Qancha maosh xohlaysiz? (so'm) <span class="req">*</span></label>
+                        <input type="number" name="xohlagan_maosh" placeholder="5000000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Bo'sh ish o'rni haqida qayerdan bildingiz? <span class="req">*</span></label>
+                        <select name="qayerdan_bildi" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Telegram">Telegram</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Tanlov">Tanlov/Tanishim</option>
+                            <option value="Boshqa">Boshqa</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sudlanganmisiz? <span class="req">*</span></label>
+                        <select name="sudlanganlik" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Yo'q">✅ Yo'q</option>
+                            <option value="Ha">⚠️ Ha</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Qo'shimcha izoh (ixtiyoriy)</label>
+                        <textarea name="qoshimcha_izoh" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOSQICH 6 -->
+            <div class="step-content" id="step-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📞</div>
+                        <div class="card-title-group">
+                            <h2>Aloqa va Hujjatlar</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Qo'shimcha telefon raqam</label>
+                        <input type="tel" name="qoshimcha_tel" placeholder="+998 XX XXX XX XX">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📸</div>
+                        <div class="card-title-group">
+                            <h2>Shaxsiy rasm</h2>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="file-drop-area">
+                            <span class="file-icon">🖼️</span>
+                            <span class="file-msg">Rasm yuklang (PNG, JPG)</span>
+                            <input class="file-input" type="file" name="rasm" accept="image/png, image/jpeg, image/jpg" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🪪</div>
+                        <div class="card-title-group">
+                            <h2>Shaxsni tasdiqlovchi hujjat</h2>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Pasport turi <span class="req">*</span></label>
+                        <select name="pasport_turi" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            <option value="Biometrik">Biometrik Pasport (Yashil)</option>
+                            <option value="ID Karta">ID Karta</option>
+                            <option value="Xorijga">Xorijga chiqish (Qizil)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="file-drop-area">
+                            <span class="file-icon">📄</span>
+                            <span class="file-msg">Hujjat nusxasi (Rasm)</span>
+                            <input class="file-input" type="file" name="pasport_fayl" accept="image/png, image/jpeg, image/jpg, application/pdf" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bottom-bar">
+            <button type="button" id="back-btn" class="btn btn-secondary" style="display:none;">‹ Orqaga</button>
+            <button type="button" id="next-btn" class="btn btn-primary">Davom etish ›</button>
+            <button type="submit" id="submit-btn" class="btn btn-primary" style="display:none;">✅ Yuborish</button>
+        </div>
+        
+    </form>
+
+    <script src="/static/app.js?v=2"></script>
+</body>
+</html>

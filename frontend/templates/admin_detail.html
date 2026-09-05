@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anketa Tafsilotlari | Zeytun HR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="text-slate-800 pb-20">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-4">
+                    <a href="/admin" class="text-slate-400 hover:text-indigo-600 transition p-2 rounded-full hover:bg-indigo-50">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </a>
+                    <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        Anketa <span class="bg-slate-100 text-slate-500 text-sm px-2 py-1 rounded-md">#{{ anketa.id }}</span>
+                    </h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <form action="/admin/anketa/{{ anketa.id }}/status" method="POST" class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                        <select name="status" class="bg-transparent border-none text-sm font-medium focus:ring-0 cursor-pointer pl-2 pr-6 py-1 outline-none">
+                            <option value="Yangi" {% if anketa.status == 'Yangi' %}selected{% endif %}>Yangi</option>
+                            <option value="Ko'rib chiqilmoqda" {% if anketa.status == "Ko'rib chiqilmoqda" %}selected{% endif %}>Ko'rib chiqilmoqda</option>
+                            <option value="Qabul qilindi" {% if anketa.status == 'Qabul qilindi' %}selected{% endif %}>Qabul qilindi</option>
+                            <option value="Rad etildi" {% if anketa.status == 'Rad etildi' %}selected{% endif %}>Rad etildi</option>
+                        </select>
+                        <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-700 shadow-sm transition">Saqlash</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        
+        <!-- Profile Header Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+            <div class="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+            <div class="px-8 pb-8">
+                <div class="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 sm:-mt-12 mb-6">
+                    <div class="relative">
+                        {% if anketa.personal_photo %}
+                            <img src="/{{ anketa.personal_photo }}" alt="Nomzod rasmi" class="w-32 h-32 object-cover rounded-2xl border-4 border-white shadow-md bg-white">
+                        {% else %}
+                            <div class="w-32 h-32 bg-slate-100 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-slate-400">
+                                <i class="fa-solid fa-user text-4xl"></i>
+                            </div>
+                        {% endif %}
+                        <div class="absolute -bottom-2 -right-2">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border shadow-sm
+                                {% if anketa.status == 'Yangi' %}bg-blue-50 text-blue-700 border-blue-200
+                                {% elif anketa.status == 'Ko\'rib chiqilmoqda' %}bg-amber-50 text-amber-700 border-amber-200
+                                {% elif anketa.status == 'Qabul qilindi' %}bg-emerald-50 text-emerald-700 border-emerald-200
+                                {% elif anketa.status == 'Rad etildi' %}bg-rose-50 text-rose-700 border-rose-200
+                                {% else %}bg-slate-50 text-slate-700 border-slate-200{% endif %}">
+                                {{ anketa.status }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex-1 text-center sm:text-left">
+                        <h2 class="text-3xl font-bold text-slate-900">{{ anketa.first_name }} {{ anketa.last_name }} {{ anketa.middle_name }}</h2>
+                        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-2 text-sm text-slate-500">
+                            <span class="flex items-center gap-1.5"><i class="fa-brands fa-telegram text-indigo-500"></i> @{{ anketa.telegram_username }}</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-phone text-emerald-500"></i> {{ anketa.phone }}</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-slate-400"></i> {{ anketa.created_at.strftime('%d.%m.%Y %H:%M') if anketa.created_at else '' }}</span>
+                        </div>
+                    </div>
+                    {% if anketa.passport_photo %}
+                    <div class="mt-4 sm:mt-0 flex-shrink-0">
+                        <a href="/{{ anketa.passport_photo }}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 shadow-sm transition">
+                            <i class="fa-solid fa-id-card"></i> Pasport nusxasi
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Quick Info -->
+            <div class="space-y-8">
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-regular fa-address-card"></i></div>
+                        Asosiy ma'lumotlar
+                    </h3>
+                    <dl class="space-y-4">
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tug'ilgan sana</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.birth_date }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Jins</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.gender }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Oilaviy holati</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.marital_status }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fizik holat (Bo'y / Vazn)</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.height }} sm / {{ anketa.weight }} kg</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-location-dot"></i></div>
+                        Manzil
+                    </h3>
+                    <dl class="space-y-4">
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Viloyat / Tuman</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.region }}, {{ anketa.district }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">To'liq manzil</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.address }}</dd>
+                        </div>
+                    </dl>
+                </div>
+
+            </div>
+
+            <!-- Middle/Right Column: Detailed Info -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Job Preferences -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-briefcase"></i></div>
+                        Ish xohishi va Talablar
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Xohlagan lavozim</p>
+                            <p class="font-bold text-indigo-700">{{ anketa.previous_position }}</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Xohlagan filial</p>
+                            <p class="font-bold text-indigo-700">{{ anketa.preferred_branch }}</p>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avval bizda ishlaganmi?</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.work_experience }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kutayotgan maosh</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.expected_salary }} so'm</dd>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-circle-info"></i></div>
+                        Qo'shimcha ma'lumotlar
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sog'liq holati</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.health_info }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sudlanganlik</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.criminal_record }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Haydovchilik guvohnomasi</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.driving_license }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fuqarolik</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.citizenship }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Qo'shimcha telefon</dt>
+                            <dd class="text-sm font-medium text-slate-800 mt-1">{{ anketa.additional_phone | default("Ko'rsatilmagan") }}</dd>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Lists (JSON) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-0 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-list-check"></i></div>
+                            Ta'lim, Oila va Boshqalar (JSON)
+                        </h3>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre class="text-xs text-slate-600 bg-slate-900 text-slate-300 p-4 rounded-xl overflow-x-auto custom-scrollbar leading-relaxed">{{ anketa.languages }}</pre>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+</body>
+</html>
