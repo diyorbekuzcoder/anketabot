@@ -14,7 +14,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+
+os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
