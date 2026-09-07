@@ -1,0 +1,15 @@
+
+services:
+  anketabot:
+    build: .
+    container_name: zeytun-anketa-bot
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Tashkent
+    volumes:
+      - ./zeytun.db:/app/zeytun.db
+      - ./uploads:/app/uploads

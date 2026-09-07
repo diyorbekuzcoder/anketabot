@@ -37,7 +37,10 @@ def get_current_admin(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/login")
 async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.username == form_data.username).first()
+    admin = db.query(Admin).filter(
+        (Admin.username == form_data.username) | (Admin.telegram_id == form_data.username)
+    ).first()
+    
     if not admin or not verify_password(form_data.password, admin.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

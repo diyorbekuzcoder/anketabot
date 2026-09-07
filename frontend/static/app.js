@@ -1,7 +1,8 @@
 let tg = window.Telegram.WebApp;
 
 tg.expand();
-tg.MainButton.hide();
+
+tg.BackButton.onClick(handleBackClick);
 
 let currentStep = 1;
 const totalSteps = 6;
@@ -39,11 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(err => console.error("Error loading options:", err));
+        
+    updateSteps(); // Initialize buttons state on load
 });
-
-const nextBtn = document.getElementById('next-btn');
-const backBtn = document.getElementById('back-btn');
-const submitBtn = document.getElementById('submit-btn');
 
 // File inputs text update
 const fileInputs = document.querySelectorAll('.file-input');
@@ -73,26 +72,30 @@ function updateSteps() {
     document.getElementById(`step-${currentStep}`).classList.add('active');
     document.getElementById(`ind-${currentStep}`).classList.add('active');
     
-    // Manage buttons
+    // Manage Telegram Native Buttons
     if (currentStep === 1) {
-        backBtn.style.display = 'none';
+        tg.BackButton.hide();
     } else {
-        backBtn.style.display = 'block';
+        tg.BackButton.show();
     }
     
+    const customBtn = document.getElementById('custom-main-btn');
     if (currentStep === totalSteps) {
-        nextBtn.style.display = 'none';
-        submitBtn.style.display = 'block';
+        customBtn.innerHTML = "Yuborish &rsaquo;";
     } else {
-        nextBtn.style.display = 'block';
-        submitBtn.style.display = 'none';
+        customBtn.innerHTML = "Davom etish &rsaquo;";
     }
     
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Navigation Events
-nextBtn.addEventListener('click', () => {
+function handleNextClick() {
+    if (currentStep === totalSteps) {
+        submitForm();
+        return;
+    }
+
     const currentStepEl = document.getElementById(`step-${currentStep}`);
     const inputs = currentStepEl.querySelectorAll('input[required], select[required], textarea[required]');
     let isValid = true;
@@ -101,8 +104,11 @@ nextBtn.addEventListener('click', () => {
         if (!input.value) {
             input.style.borderColor = '#EF4444';
             isValid = false;
+            // Add slight shake animation for error
+            input.parentElement.classList.add('shake');
+            setTimeout(() => input.parentElement.classList.remove('shake'), 400);
         } else {
-            input.style.borderColor = '#E2E8F0';
+            input.style.borderColor = 'var(--border-color)';
         }
     });
 
@@ -119,22 +125,25 @@ nextBtn.addEventListener('click', () => {
     }
     
     if (!isValid) {
+        tg.HapticFeedback.notificationOccurred('error');
         tg.showAlert("Iltimos, barcha majburiy maydonlarni to'ldiring (*).");
         return;
     }
     
     if (currentStep < totalSteps) {
+        tg.HapticFeedback.impactOccurred('light');
         currentStep++;
         updateSteps();
     }
-});
+}
 
-backBtn.addEventListener('click', () => {
+function handleBackClick() {
     if (currentStep > 1) {
+        tg.HapticFeedback.impactOccurred('light');
         currentStep--;
         updateSteps();
     }
-});
+}
 
 // Dynamic List Logics
 let listData = {
@@ -171,11 +180,13 @@ function renderList(listId, dataArray, dataKey) {
 }
 
 window.removeItem = function(dataKey, index, listId) {
+    tg.HapticFeedback.impactOccurred('medium');
     listData[dataKey].splice(index, 1);
     renderList(listId, listData[dataKey], dataKey);
 };
 
 window.addChild = function() {
+    tg.HapticFeedback.impactOccurred('light');
     let childInfo = window.prompt("Farzand ismini va tug'ilgan yilini kiriting:");
     if(childInfo && childInfo.trim() !== '') {
         listData.children.push(childInfo);
@@ -184,6 +195,7 @@ window.addChild = function() {
 };
 
 window.addFamily = function() {
+    tg.HapticFeedback.impactOccurred('light');
     let familyInfo = window.prompt("Oila a'zosining ismi va qarindoshligi (Masalan: Aliyev Vali, Ota):");
     if(familyInfo && familyInfo.trim() !== '') {
         listData.family.push(familyInfo);
@@ -192,6 +204,7 @@ window.addFamily = function() {
 };
 
 window.addEducation = function() {
+    tg.HapticFeedback.impactOccurred('light');
     let eduInfo = window.prompt("O'qish joyi nomi va mutaxassisligi:");
     if(eduInfo && eduInfo.trim() !== '') {
         listData.education.push(eduInfo);
@@ -200,6 +213,7 @@ window.addEducation = function() {
 };
 
 window.addLanguage = function() {
+    tg.HapticFeedback.impactOccurred('light');
     let langInfo = window.prompt("Til va bilish darajasi (Masalan: Rus tili, 80%):");
     if(langInfo && langInfo.trim() !== '') {
         listData.languages.push(langInfo);
@@ -208,6 +222,7 @@ window.addLanguage = function() {
 };
 
 window.addSoftware = function() {
+    tg.HapticFeedback.impactOccurred('light');
     let softInfo = window.prompt("Dastur nomi va darajasi (Masalan: Excel, O'rta):");
     if(softInfo && softInfo.trim() !== '') {
         listData.software.push(softInfo);
@@ -216,6 +231,7 @@ window.addSoftware = function() {
 };
 
 window.addExperience = function() {
+    tg.HapticFeedback.impactOccurred('light');
     let expInfo = window.prompt("Ish joyi nomi va qancha ishlagansiz:");
     if(expInfo && expInfo.trim() !== '') {
         listData.experience.push(expInfo);
@@ -225,10 +241,12 @@ window.addExperience = function() {
 
 // Form Submission
 const form = document.getElementById('anketa-form');
-
+// Prevent default submission if triggered by enter key
 form.addEventListener('submit', function(e) {
     e.preventDefault();
-    
+});
+
+function submitForm() {
     const currentStepEl = document.getElementById(`step-6`);
     const inputs = currentStepEl.querySelectorAll('input[type="file"][required]');
     let isValid = true;
@@ -236,12 +254,15 @@ form.addEventListener('submit', function(e) {
         if (!input.files || input.files.length === 0) {
             input.parentElement.style.borderColor = '#EF4444';
             isValid = false;
+            input.parentElement.classList.add('shake');
+            setTimeout(() => input.parentElement.classList.remove('shake'), 400);
         } else {
-            input.parentElement.style.borderColor = '#6366F1';
+            input.parentElement.style.borderColor = 'var(--primary-light)';
         }
     });
     
     if (!isValid) {
+        tg.HapticFeedback.notificationOccurred('error');
         tg.showAlert("Iltimos, rasm va hujjatni yuklang.");
         return;
     }
@@ -254,8 +275,9 @@ form.addEventListener('submit', function(e) {
     
     formData.append('dynamic_lists', JSON.stringify(listData));
     
-    submitBtn.innerHTML = "Yuborilmoqda...";
-    submitBtn.disabled = true;
+    const customBtn = document.getElementById('custom-main-btn');
+    customBtn.innerHTML = "Yuborilmoqda... ⏳";
+    customBtn.disabled = true;
     
     fetch('/submit_form', {
         method: 'POST',
@@ -263,19 +285,23 @@ form.addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(result => {
+        customBtn.innerHTML = "Yuborish &rsaquo;";
+        customBtn.disabled = false;
         if (result.status === 'success') {
-            tg.showAlert("Anketa muvaffaqiyatli qabul qilindi!");
-            tg.close();
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Anketa muvaffaqiyatli qabul qilindi!", () => {
+                tg.close();
+            });
         } else {
+            tg.HapticFeedback.notificationOccurred('error');
             tg.showAlert("Xatolik yuz berdi: " + result.message);
-            submitBtn.innerHTML = "✅ Yuborish";
-            submitBtn.disabled = false;
         }
     })
     .catch(error => {
+        customBtn.innerHTML = "Yuborish &rsaquo;";
+        customBtn.disabled = false;
         console.error('Error:', error);
+        tg.HapticFeedback.notificationOccurred('error');
         tg.showAlert("Xatolik yuz berdi, qayta urinib ko'ring.");
-        submitBtn.innerHTML = "✅ Yuborish";
-        submitBtn.disabled = false;
     });
-});
+}

@@ -35,6 +35,11 @@
                         </select>
                         <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-700 shadow-sm transition">Saqlash</button>
                     </form>
+                    <form action="/admin/anketa/{{ anketa.id }}/delete" method="POST" onsubmit="return confirm('Rostdan ham bu arizani o\'chirmoqchimisiz?');">
+                        <button type="submit" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg border border-rose-200 text-sm font-medium hover:bg-rose-100 shadow-sm transition" title="O'chirish">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

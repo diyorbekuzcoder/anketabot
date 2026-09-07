@@ -53,5 +53,5 @@ class Application(Base):
     status = Column(String, default="Yangi") # Yangi, Ko'rib chiqilmoqda, Suhbatga chaqirildi, Qabul qilindi, Rad etildi, Arxiv
     admin_comment = Column(Text, nullable=True)
     
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)

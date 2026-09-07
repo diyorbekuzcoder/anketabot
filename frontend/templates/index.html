@@ -254,6 +254,8 @@
                             <option value="" disabled selected>Tanlang</option>
                             <option value="Toshkent sh.">Toshkent sh.</option>
                             <option value="Toshkent vil.">Toshkent vil.</option>
+                            <option value="Namangan sh.">Namangan sh.</option>
+                            <option value="Namangan vil.">Namangan vil.</option>
                             <option value="Samarqand">Samarqand vil.</option>
                             <option value="Boshqa">Boshqa</option>
                         </select>
@@ -261,7 +263,23 @@
                     
                     <div class="form-group">
                         <label>Shahar / Tuman <span class="req">*</span></label>
-                        <input type="text" name="tuman" placeholder="Tumanni kiriting" required>
+                        <input type="text" name="tuman" list="namangan-tumanlar" placeholder="Tumanni kiriting" required>
+                        <datalist id="namangan-tumanlar">
+                            <option value="Namangan shahar">
+                            <option value="Mingbuloq tumani">
+                            <option value="Kosonsoy tumani">
+                            <option value="Namangan tumani">
+                            <option value="Norin tumani">
+                            <option value="Pop tumani">
+                            <option value="To'raqo'rg'on tumani">
+                            <option value="Uychi tumani">
+                            <option value="Uchqo'rg'on tumani">
+                            <option value="Chortoq tumani">
+                            <option value="Chust tumani">
+                            <option value="Yangiqo'rg'on tumani">
+                            <option value="Davlatobod tumani">
+                            <option value="Yangi Namangan tumani">
+                        </datalist>
                     </div>
                     
                     <div class="form-group">
@@ -557,16 +575,14 @@
                 </div>
             </div>
 
-        </div>
-
-        <div class="bottom-bar">
-            <button type="button" id="back-btn" class="btn btn-secondary" style="display:none;">‹ Orqaga</button>
-            <button type="button" id="next-btn" class="btn btn-primary">Davom etish ›</button>
-            <button type="submit" id="submit-btn" class="btn btn-primary" style="display:none;">✅ Yuborish</button>
-        </div>
         
     </form>
+    
+    <!-- Custom Floating Main Button -->
+    <div class="bottom-button-container">
+        <button id="custom-main-btn" onclick="handleNextClick()">Davom etish &rsaquo;</button>
+    </div>
 
-    <script src="/static/app.js?v=2"></script>
+    <script src="/static/app.js?v=3"></script>
 </body>
 </html>

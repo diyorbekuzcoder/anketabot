@@ -9,11 +9,15 @@ from backend.database.database import get_db
 from backend.models.application import Application
 from backend.models.branch import Branch
 from backend.models.position import Position
+from backend.models.admin import Admin
+from backend.utils.security import get_password_hash
 from backend.api import auth
 from starlette.concurrency import run_in_threadpool
 import pandas as pd
 import io
 from fastapi.responses import StreamingResponse
+from fastapi import UploadFile, File
+from backend.services.s3_client import save_upload_file
 
 router = APIRouter()
 templates = Jinja2Templates(directory="frontend/templates")
@@ -86,11 +90,16 @@ async def admin_dashboard(
     branches = db.query(Branch).order_by(Branch.id.desc()).all()
     positions = db.query(Position).order_by(Position.id.desc()).all()
     
+    users = []
+    if admin.role == "Super Admin":
+        users = db.query(Admin).order_by(Admin.id.asc()).all()
+    
     context = {
         "anketalar": anketalar, 
         "admin": admin, 
         "branches": branches, 
         "positions": positions,
+        "users": users,
         "filters": {
             "status": status or "",
             "branch": branch or "",
@@ -126,6 +135,15 @@ async def update_anketa_status(request: Request, anketa_id: int, status: str = F
     db.commit()
     return RedirectResponse(url=f"/admin/anketa/{anketa_id}", status_code=303)
 
+@router.post("/anketa/{anketa_id}/delete")
+async def delete_anketa(request: Request, anketa_id: int, db: Session = Depends(get_db)):
+    auth.get_current_admin(request, db)
+    anketa = db.query(Application).filter(Application.id == anketa_id).first()
+    if anketa:
+        db.delete(anketa)
+        db.commit()
+    return RedirectResponse(url="/admin", status_code=303)
+
 @router.post("/branches")
 async def add_branch(request: Request, name: str = Form(...), db: Session = Depends(get_db)):
     auth.get_current_admin(request, db)
@@ -159,3 +177,117 @@ async def delete_position(request: Request, position_id: int, db: Session = Depe
         db.delete(position)
         db.commit()
     return RedirectResponse(url="/admin", status_code=303)
+
+# Admin Users Management
+
+@router.post("/users")
+async def add_admin_user(request: Request, username: str = Form(...), password: str = Form(...), role: str = Form(...), full_name: str = Form(""), db: Session = Depends(get_db)):
+    current_admin = auth.get_current_admin(request, db)
+    if current_admin.role != "Super Admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    existing = db.query(Admin).filter(Admin.username == username).first()
+    if existing:
+        # Instead of failing silently, ideally we'd show an error, but let's just redirect for now
+        return RedirectResponse(url="/admin#users", status_code=303)
+        
+    new_admin = Admin(
+        username=username,
+        password_hash=get_password_hash(password),
+        full_name=full_name,
+        role=role,
+        is_active=True
+    )
+    db.add(new_admin)
+    db.commit()
+    return RedirectResponse(url="/admin#users", status_code=303)
+
+@router.post("/users/{user_id}/update")
+async def update_admin_user(request: Request, user_id: int, username: str = Form(...), password: str = Form(""), role: str = Form(...), full_name: str = Form(""), db: Session = Depends(get_db)):
+    current_admin = auth.get_current_admin(request, db)
+    if current_admin.role != "Super Admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    admin_user = db.query(Admin).filter(Admin.id == user_id).first()
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # Check if new username conflicts
+    if username != admin_user.username:
+        existing = db.query(Admin).filter(Admin.username == username).first()
+        if existing:
+            return RedirectResponse(url="/admin#users", status_code=303)
+            
+    admin_user.username = username
+    admin_user.full_name = full_name
+    admin_user.role = role
+    if password:
+        admin_user.password_hash = get_password_hash(password)
+        
+    db.commit()
+    return RedirectResponse(url="/admin#users", status_code=303)
+
+@router.post("/users/{user_id}/delete")
+async def delete_admin_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+    current_admin = auth.get_current_admin(request, db)
+    if current_admin.role != "Super Admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    # Prevent deleting oneself
+    if current_admin.id == user_id:
+        return RedirectResponse(url="/admin#users", status_code=303)
+        
+    admin_user = db.query(Admin).filter(Admin.id == user_id).first()
+    if admin_user:
+        db.delete(admin_user)
+        db.commit()
+    return RedirectResponse(url="/admin#users", status_code=303)
+
+@router.post("/profile/password")
+async def update_profile_password(
+    password: str = Form(...),
+    current_user: Admin = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    current_user.password_hash = get_password_hash(password)
+    db.commit()
+    return {"status": "success", "message": "Password updated successfully"}
+
+@router.post("/profile/update")
+async def update_profile_details(
+    phone_number: str = Form(None),
+    telegram_id: str = Form(None),
+    current_user: Admin = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    # Check if telegram_id is unique if it's changing
+    if telegram_id and telegram_id != current_user.telegram_id:
+        existing = db.query(Admin).filter(Admin.telegram_id == telegram_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Telegram ID already in use by another admin")
+    
+    current_user.phone_number = phone_number
+    current_user.telegram_id = telegram_id
+    db.commit()
+    return {"status": "success", "message": "Profile updated successfully"}
+
+@router.post("/profile/upload_picture")
+async def upload_profile_picture(
+    file: UploadFile = File(...),
+    current_user: Admin = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    try:
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="Faqat rasmlar yuklash mumkin")
+            
+        final_url = await save_upload_file(file)
+        if not final_url:
+            raise HTTPException(status_code=500, detail="Faylni yuklashda xatolik yuz berdi")
+        
+        current_user.profile_picture = final_url
+        db.commit()
+        return {"status": "success", "url": final_url}
+    except Exception as e:
+        print(f"Error uploading profile picture: {e}")
+        raise HTTPException(status_code=500, detail="Error uploading file")
