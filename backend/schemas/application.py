@@ -55,5 +55,7 @@ class AnketaFormModel(BaseModel):
     qoshimcha_izoh: str = Field("Yoq", description="Qo'shimcha izoh")
     
     # 6. Aloqa va hujjat
-    qoshimcha_tel: str = Field("Yoq", description="Qo'shimcha tel")
+    telefon: str = Field(..., description="Asosiy telefon raqam")
+    telegram_user: str = Field(..., description="Telegram username")
+    qoshimcha_tel: Optional[str] = Field("Yoq", description="Qo'shimcha tel")
     pasport_turi: str = Field(..., description="Pasport turi")

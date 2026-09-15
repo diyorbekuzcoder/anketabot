@@ -3,63 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeytun HR - Tizimiga Kirish</title>
+    <title>ZEYTUN MARKET - Tizimga kirish</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%);
+            background-color: #f0f4f8; /* Soft background color matching image */
             min-height: 100vh;
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        h1, h2 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .input-icon-container {
+            position: relative;
+        }
+        .input-icon-container i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        .input-icon-container .left-icon {
+            left: 1.2rem;
+            font-size: 1.1rem;
+        }
+        .input-icon-container .right-icon {
+            right: 1.2rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .custom-input {
+            padding-left: 3.2rem;
+            padding-right: 1rem;
+            border-color: #d1d5db;
+        }
+        .custom-input:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 1px #0f766e;
+        }
+        .custom-input-password {
+            padding-left: 3.2rem;
+            padding-right: 3.2rem;
+            border-color: #d1d5db;
+        }
+        .custom-input-password:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 1px #0f766e;
+        }
+        .btn-green {
+            background-color: #0d685c;
+            color: white;
+        }
+        .btn-green:hover {
+            background-color: #0b554b;
+        }
+        .btn-blue {
+            background-color: #4ea8e9;
+            color: white;
+        }
+        .btn-blue:hover {
+            background-color: #3b97d8;
+        }
+        .custom-checkbox {
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25em;
+            display: grid;
+            place-content: center;
+        }
+        .custom-checkbox::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: white;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .custom-checkbox:checked {
+            background-color: #0d685c;
+            border-color: #0d685c;
+        }
+        .custom-checkbox:checked::before {
+            transform: scale(1);
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body class="flex flex-col items-center justify-center p-4">
 
-    <div class="glass-card w-full max-w-md rounded-2xl p-8 sm:p-10 transition-all duration-300">
+    <div class="w-full max-w-[460px] bg-white rounded-[24px] p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 mb-4">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-900">Xush kelibsiz</h2>
-            <p class="text-sm text-gray-500 mt-2">HR Boshqaruv paneliga kirish uchun ma'lumotlarni kiriting</p>
+            <h2 class="text-[11px] font-bold tracking-[0.15em] text-[#0d685c] uppercase mb-3">ZEYTUN MARKET</h2>
+            <h1 class="text-[32px] font-extrabold text-[#0f172a] mb-2 tracking-tight">Tizimga kirish</h1>
+            <p class="text-[15px] text-gray-500 font-medium">Login/parol yoki Telegram orqali tizimga kiring</p>
         </div>
         
-        <form id="loginForm" class="space-y-6">
+        <form id="loginForm" class="space-y-5">
             <div>
-                <label for="username" class="block text-sm font-medium text-gray-700">Login yoki Telegram ID</label>
-                <div class="mt-1">
-                    <input id="username" name="username" type="text" required class="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-200" placeholder="admin yoki 123456789">
+                <label for="username" class="block text-[14px] font-semibold text-gray-700 mb-2">Login</label>
+                <div class="input-icon-container">
+                    <i class="fa-regular fa-user left-icon text-gray-400"></i>
+                    <input id="username" name="username" type="text" required class="appearance-none block w-full custom-input py-3.5 border rounded-[12px] placeholder-gray-400 focus:outline-none sm:text-sm transition duration-200" placeholder="admin yoki telegram id">
                 </div>
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Parol</label>
-                <div class="mt-1">
-                    <input id="password" name="password" type="password" required class="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-200" placeholder="••••••••">
+                <label for="password" class="block text-[14px] font-semibold text-gray-700 mb-2">Parol</label>
+                <div class="input-icon-container">
+                    <i class="fa-solid fa-lock left-icon text-gray-400"></i>
+                    <input id="password" name="password" type="password" required class="appearance-none block w-full custom-input-password py-3.5 border rounded-[12px] placeholder-gray-400 focus:outline-none text-xl tracking-[0.2em] transition duration-200" placeholder="••••••••">
+                    <i class="fa-regular fa-eye right-icon text-gray-400 hover:text-gray-600 transition" id="togglePassword"></i>
                 </div>
             </div>
 
-            <div>
-                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 transform hover:-translate-y-0.5">
-                    Tizimga kirish
+            <div class="flex items-center pt-2">
+                <input id="remember-me" name="remember-me" type="checkbox" class="custom-checkbox cursor-pointer">
+                <label for="remember-me" class="ml-2.5 block text-sm text-gray-600 font-medium cursor-pointer">
+                    Eslab qolish
+                </label>
+            </div>
+
+            <div class="pt-3">
+                <button type="submit" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-[12px] text-[16px] font-bold btn-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0d685c] transition duration-200">
+                    Kirish
                 </button>
             </div>
+            
+            <div id="errorMsg" class="mt-2 p-3 rounded-lg bg-red-50 text-red-600 text-sm text-center font-medium" style="display:none;"></div>
         </form>
         
-        <div id="errorMsg" class="mt-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm text-center font-medium" style="display:none;"></div>
+        <div class="mt-8 mb-8 relative">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-200"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-5 bg-white text-gray-400 font-semibold tracking-widest text-[11px] uppercase">YOKI</span>
+            </div>
+        </div>
+
+        <div>
+            <button type="button" onclick="loginWithTelegram()" class="w-full flex items-center justify-center gap-2.5 py-4 px-4 border border-transparent rounded-[12px] text-[16px] font-bold btn-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition duration-200">
+                <i class="fa-brands fa-telegram fa-xl text-white"></i>
+                Telegram orqali kirish
+            </button>
+            <p class="text-center text-[13px] text-gray-500 mt-5 leading-relaxed max-w-[280px] mx-auto">
+                Telegram orqali bir martalik tasdiqlashdan keyin tizimga kirishingiz mumkin.
+            </p>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center text-[14px] text-gray-500 font-medium tracking-wide">
+        2026 | Zeytun Market
     </div>
 
     <script>
+        // Password toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function (e) {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Form Submission
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
+            const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
             btn.innerText = "Kutib turing...";
             btn.disabled = true;
@@ -93,6 +215,57 @@
                 btn.disabled = false;
             }
         });
+
+        let pollingInterval = null;
+
+        async function loginWithTelegram() {
+            try {
+                // Get auth token and bot url
+                const res = await fetch('/api/auth/telegram/start');
+                const data = await res.json();
+                
+                // Open bot URL in new tab
+                window.open(data.bot_url, '_blank');
+                
+                // Start polling
+                const btn = document.querySelector('button[onclick="loginWithTelegram()"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin fa-xl text-white"></i> Tasdiqlash kutilmoqda...';
+                btn.disabled = true;
+                
+                if (pollingInterval) clearInterval(pollingInterval);
+                
+                let attempts = 0;
+                pollingInterval = setInterval(async () => {
+                    attempts++;
+                    if (attempts > 60) { // 2 minutes timeout
+                        clearInterval(pollingInterval);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        const err = document.getElementById('errorMsg');
+                        err.innerText = "Vaqt tugadi. Iltimos qaytadan urinib ko'ring.";
+                        err.style.display = 'block';
+                        return;
+                    }
+                    
+                    try {
+                        const statusRes = await fetch(`/api/auth/telegram/status?token=${data.token}`);
+                        const statusData = await statusRes.json();
+                        
+                        if (statusData.status === 'ok') {
+                            clearInterval(pollingInterval);
+                            window.location.href = '/admin';
+                        }
+                    } catch (e) {
+                        console.error('Polling error:', e);
+                    }
+                }, 2000); // Check every 2 seconds
+                
+            } catch (error) {
+                console.error('Error starting telegram auth:', error);
+                alert("Xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.");
+            }
+        }
     </script>
 </body>
 </html>

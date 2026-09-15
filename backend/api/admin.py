@@ -64,6 +64,7 @@ async def admin_dashboard(
     branch: Optional[str] = None,
     position: Optional[str] = None,
     search: Optional[str] = None,
+    clear: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     try:
@@ -71,6 +72,22 @@ async def admin_dashboard(
     except HTTPException:
         return templates.TemplateResponse(request=request, name="login.html")
         
+    has_params = any(x is not None for x in [status, branch, position, search])
+    
+    if clear == "true":
+        status = branch = position = search = ""
+    elif not has_params:
+        saved_filters = request.cookies.get("admin_filters")
+        if saved_filters:
+            try:
+                filters = json.loads(saved_filters)
+                status = filters.get("status")
+                branch = filters.get("branch")
+                position = filters.get("position")
+                search = filters.get("search")
+            except:
+                pass
+
     query = db.query(Application)
     if status:
         query = query.filter(Application.status == status)
@@ -107,7 +124,20 @@ async def admin_dashboard(
             "search": search or ""
         }
     }
-    return templates.TemplateResponse(request=request, name="admin.html", context=context)
+    response = templates.TemplateResponse(request=request, name="admin.html", context=context)
+    
+    if clear == "true":
+        response.delete_cookie("admin_filters")
+    else:
+        filters_dict = {
+            "status": status or "",
+            "branch": branch or "",
+            "position": position or "",
+            "search": search or ""
+        }
+        response.set_cookie("admin_filters", json.dumps(filters_dict), max_age=86400)
+        
+    return response
 
 @router.get("/anketa/{anketa_id}", response_class=HTMLResponse)
 async def admin_anketa_detail(request: Request, anketa_id: int, db: Session = Depends(get_db)):
@@ -131,8 +161,21 @@ async def update_anketa_status(request: Request, anketa_id: int, status: str = F
     if not anketa:
         raise HTTPException(status_code=404, detail="Anketa topilmadi")
     
-    anketa.status = status
-    db.commit()
+    if anketa.status != status:
+        old_status = anketa.status
+        anketa.status = status
+        db.commit()
+        
+        # Notify the applicant via Telegram bot
+        if anketa.telegram_user_id:
+            try:
+                from bot.setup import bot
+                import logging
+                msg = f"Hurmatli {anketa.first_name}, sizning anketangiz holati o'zgardi.\nJoriy holat: {status}"
+                await bot.send_message(chat_id=anketa.telegram_user_id, text=msg)
+            except Exception as e:
+                logging.error(f"Foydalanuvchiga xabar yuborishda xatolik ({anketa.telegram_user_id}): {e}")
+                
     return RedirectResponse(url=f"/admin/anketa/{anketa_id}", status_code=303)
 
 @router.post("/anketa/{anketa_id}/delete")

@@ -5,8 +5,35 @@ from bot.config import WEB_APP_URL
 
 router = Router()
 
+from backend.database.database import get_db
+from backend.models.admin import Admin
+from backend.api.auth import telegram_auth_sessions
+
 @router.message(CommandStart())
 async def start_cmd(message: types.Message):
+    parts = message.text.split()
+    args = parts[1] if len(parts) > 1 else None
+    if args and args.startswith("auth_"):
+        token = args.split("_")[1]
+        
+        # Check if user is an admin
+        from backend.database.database import SessionLocal
+        db = SessionLocal()
+        admin = db.query(Admin).filter(Admin.telegram_id == str(message.from_user.id), Admin.is_active == True).first()
+        db.close()
+        
+        if admin:
+            if token in telegram_auth_sessions:
+                telegram_auth_sessions[token]["status"] = "authenticated"
+                telegram_auth_sessions[token]["admin_username"] = admin.username
+                telegram_auth_sessions[token]["admin_role"] = admin.role
+                await message.answer("✅ Muvaffaqiyatli kirdingiz! Endi saytga qaytishingiz mumkin.")
+            else:
+                await message.answer("❌ Ulanish vaqti tugagan yoki xato. Iltimos saytdan qayta urinib ko'ring.")
+        else:
+            await message.answer("❌ Siz admin emassiz yoki telegram raqamingiz admin paneliga kiritilmagan.")
+        return
+
     markup = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Yo'riqnoma"), KeyboardButton(text="Anketa")]
