@@ -77,16 +77,10 @@ async def admin_dashboard(
     if clear == "true":
         status = branch = position = search = ""
     elif not has_params:
-        saved_filters = request.cookies.get("admin_filters")
-        if saved_filters:
-            try:
-                filters = json.loads(saved_filters)
-                status = filters.get("status")
-                branch = filters.get("branch")
-                position = filters.get("position")
-                search = filters.get("search")
-            except:
-                pass
+        status = request.cookies.get("admin_filter_status", "")
+        branch = request.cookies.get("admin_filter_branch", "")
+        position = request.cookies.get("admin_filter_position", "")
+        search = request.cookies.get("admin_filter_search", "")
 
     query = db.query(Application)
     if status:
@@ -128,15 +122,18 @@ async def admin_dashboard(
     
     if clear == "true":
         response.delete_cookie("admin_filters")
+        response.delete_cookie("admin_filter_status")
+        response.delete_cookie("admin_filter_branch")
+        response.delete_cookie("admin_filter_position")
+        response.delete_cookie("admin_filter_search")
     else:
-        filters_dict = {
-            "status": status or "",
-            "branch": branch or "",
-            "position": position or "",
-            "search": search or ""
-        }
-        response.set_cookie("admin_filters", json.dumps(filters_dict), max_age=86400)
+        response.set_cookie("admin_filter_status", status or "", max_age=86400)
+        response.set_cookie("admin_filter_branch", branch or "", max_age=86400)
+        response.set_cookie("admin_filter_position", position or "", max_age=86400)
+        response.set_cookie("admin_filter_search", search or "", max_age=86400)
         
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    
     return response
 
 @router.get("/anketa/{anketa_id}", response_class=HTMLResponse)
