@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api import auth, admin, forms, bot
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+
+from backend.api import admin, auth, bot, forms
 
 app = FastAPI()
 
@@ -26,13 +27,16 @@ app.include_router(admin.router, prefix="/admin", tags=["admin"])
 app.include_router(forms.router, tags=["forms"])
 app.include_router(bot.router, prefix="/api/bot", tags=["bot"])
 
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
 
+
 @app.get("/")
 async def root_redirect():
     return RedirectResponse(url="/form")
+
 
 @app.get("/logout")
 async def logout():

@@ -1,16 +1,21 @@
-import os
-import uvicorn
 import logging
+import os
 from contextlib import asynccontextmanager
+
+import uvicorn
+
 from backend.app import app
-from bot.setup import bot, dp
 from bot.handlers import router
+from bot.setup import bot, dp
 
 if router not in dp.sub_routers:
     dp.include_router(router)
 
-WEBHOOK_URL = os.getenv("WEBHOOK_URL") # e.g. https://your-cloudflare-tunnel.trycloudflare.com/api/bot/webhook
+WEBHOOK_URL = os.getenv(
+    "WEBHOOK_URL"
+)  # e.g. https://your-cloudflare-tunnel.trycloudflare.com/api/bot/webhook
 WEBHOOK_PATH = "/api/bot/webhook"
+
 
 @asynccontextmanager
 async def lifespan(app):
@@ -25,10 +30,12 @@ async def lifespan(app):
         await bot.delete_webhook(drop_pending_updates=True)
         logging.info("Starting bot in long-polling mode (Fallback)")
         import asyncio
+
         asyncio.create_task(dp.start_polling(bot))
     yield
     # Shutdown
     await bot.session.close()
+
 
 app.router.lifespan_context = lifespan
 

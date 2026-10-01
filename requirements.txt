@@ -12,3 +12,4 @@ openpyxl
 python-multipart
 aioboto3
 jinja2
+httpx

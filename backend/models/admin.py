@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
+
 from backend.database.database import Base
+
 
 class Admin(Base):
     __tablename__ = "admins"
@@ -12,6 +15,6 @@ class Admin(Base):
     profile_picture = Column(String, nullable=True)
     phone_number = Column(String, nullable=True)
     telegram_id = Column(String, nullable=True, unique=True)
-    role = Column(String, default="HR Admin") # Super Admin, HR Admin, Viewer
+    role = Column(String, default="HR Admin")  # Super Admin, HR Admin, Viewer
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.now)
