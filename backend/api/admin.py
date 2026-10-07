@@ -156,16 +156,56 @@ async def admin_anketa_detail(
     if not anketa:
         raise HTTPException(status_code=404, detail="Anketa topilmadi")
 
+    # Barcha matnli ma'lumotlardagi HTML belgilarni (masalan &#x27; -> ') to'g'irlaymiz
+    import html
+    for key, value in vars(anketa).items():
+        if isinstance(value, str):
+            setattr(anketa, key, html.unescape(value))
+
     try:
         dl = json.loads(anketa.languages)
         anketa.languages = json.dumps(dl, indent=2, ensure_ascii=False)
     except:
         pass
 
+    # Read current filters from cookies to find Next/Prev
+    status = request.cookies.get("admin_filter_status", "")
+    branch = request.cookies.get("admin_filter_branch", "")
+    position = request.cookies.get("admin_filter_position", "")
+    search = request.cookies.get("admin_filter_search", "")
+
+    query = db.query(Application.id)
+    if status:
+        query = query.filter(Application.status == status)
+    if branch:
+        query = query.filter(Application.preferred_branch == branch)
+    if position:
+        query = query.filter(Application.previous_position == position)
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            (Application.first_name.ilike(search_term))
+            | (Application.last_name.ilike(search_term))
+            | (Application.phone.ilike(search_term))
+        )
+    
+    all_ids = [a[0] for a in query.order_by(Application.id.desc()).all()]
+    
+    prev_id = None
+    next_id = None
+    try:
+        idx = all_ids.index(anketa_id)
+        if idx > 0:
+            prev_id = all_ids[idx - 1] # newer application
+        if idx < len(all_ids) - 1:
+            next_id = all_ids[idx + 1] # older application
+    except ValueError:
+        pass
+
     return templates.TemplateResponse(
         request=request,
         name="admin_detail.html",
-        context={"anketa": anketa, "admin": admin},
+        context={"anketa": anketa, "admin": admin, "prev_id": prev_id, "next_id": next_id},
     )
 
 

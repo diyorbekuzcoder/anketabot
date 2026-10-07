@@ -18,12 +18,26 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-4">
-                    <a href="/admin" class="text-slate-400 hover:text-indigo-600 transition p-2 rounded-full hover:bg-indigo-50">
+                    <a href="/admin" class="text-slate-400 hover:text-indigo-600 transition p-2 rounded-full hover:bg-indigo-50" title="Orqaga">
                         <i class="fa-solid fa-arrow-left text-xl"></i>
                     </a>
                     <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                         Anketa <span class="bg-slate-100 text-slate-500 text-sm px-2 py-1 rounded-md">#{{ anketa.id }}</span>
                     </h1>
+                    
+                    <!-- Next/Prev buttons -->
+                    <div class="flex items-center gap-1 ml-4 border-l border-slate-200 pl-4">
+                        {% if prev_id %}
+                        <a href="/admin/anketa/{{ prev_id }}" class="text-slate-500 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2" title="Oldingi (Yangi) anketa">
+                            <i class="fa-solid fa-chevron-left"></i> Oldingisi
+                        </a>
+                        {% endif %}
+                        {% if next_id %}
+                        <a href="/admin/anketa/{{ next_id }}" class="text-slate-500 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2" title="Keyingi (Eski) anketa">
+                            Keyingisi <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <form action="/admin/anketa/{{ anketa.id }}/status" method="POST" class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200">

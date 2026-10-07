@@ -4,6 +4,7 @@ import logging
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from starlette.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
 
 from backend.database.database import get_db
@@ -38,6 +39,13 @@ async def submit_form(request: Request, db: Session = Depends(get_db)):
             }
 
         validated_data = AnketaFormModel(**form_data)
+
+        # HTML-encoded belgilarni tozalaymiz (masalan &#x27; -> ')
+        import html as html_lib
+        for field in validated_data.model_fields:
+            val = getattr(validated_data, field, None)
+            if isinstance(val, str):
+                setattr(validated_data, field, html_lib.unescape(val))
 
         rasm = form_data.get("rasm")
         pasport_fayl = form_data.get("pasport_fayl")
@@ -80,9 +88,12 @@ async def submit_form(request: Request, db: Session = Depends(get_db)):
             languages=dynamic_lists_str,
         )
 
-        db.add(yangi_anketa)
-        db.commit()
-        db.refresh(yangi_anketa)
+        def save_application():
+            db.add(yangi_anketa)
+            db.commit()
+            db.refresh(yangi_anketa)
+        
+        await run_in_threadpool(save_application)
 
         user_id = validated_data.user_id
         if user_id:
